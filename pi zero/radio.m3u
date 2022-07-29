@@ -1,0 +1,31 @@
+#EXTM3U
+
+#EXTINF:-1,France Inter
+http://chai5she.cdn.dvmr.fr/franceinter-midfi.mp3
+
+#EXTINF:-1,Rire et Chanson
+http://185.52.127.168/fr/30401/mp3_128.mp3?origine=fluxradios
+
+#EXTINF:-1,France Info
+http://chai5she.cdn.dvmr.fr/franceinfo-midfi.mp3
+
+#EXTINF:-1,France Culture
+http://chai5she.cdn.dvmr.fr/franceculture-midfi.mp3
+
+#EXTINF:-1,France Musique
+http://chai5she.cdn.dvmr.fr/francemusique-midfi.mp3
+
+#EXTINF:-1,Fip
+http://chai5she.cdn.dvmr.fr/fip-midfi.mp3
+
+#EXTINF:-1,Nova
+http://novazz.ice.infomaniak.ch/novazz-128.mp3
+
+#EXTINF:-1,Mouv'
+http://chai5she.cdn.dvmr.fr/mouv-midfi.mp3
+
+#EXTINF:-1,Nostalgie
+http://185.52.127.163/fr/30601/mp3_128.mp3?origine=fluxradios
+
+#EXTINF:-1,NRJ
+http://185.52.127.173/fr/30001/mp3_128.mp3?origine=fluxradios

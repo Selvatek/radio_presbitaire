@@ -1,0 +1,163 @@
+# Simple Raspberry PI Internet radio using four buttons
+import RPi.GPIO as GPIO
+import os
+import time
+import atexit
+from time import sleep
+from RPLCD import CharLCD
+lcd = CharLCD(cols=16, rows=2, pin_rs=37, pin_e=35, pins_data=[33, 31, 29, 23])
+
+# Switch definitions
+start = True
+SHUTDOWN = 7
+VOLUME_UP = 16
+VOLUME_DOWN = 22
+CHANNEL_UP = 12
+CHANNEL_DOWN = 32
+RADIO_station = 1
+station = 1
+volume = 1
+current = 1
+def affichage():
+	global current
+	global volume
+#	GPIO.setup(VOLUME_UP, GPIO.OUT)
+#	GPIO.setup(VOLUME_DOWN, GPIO.OUT)
+#	GPIO.setup(CHANNEL_UP, GPIO.OUT)
+ #       GPIO.setup(CHANNEL_DOWN, GPIO.OUT)
+	lcd.cursor_pos = (0, 0)
+        lcd.write_string("                ")
+
+	lcd.cursor_pos = (0, 0)
+        af_test = str(current)
+	vol = str(volume)
+	lcd.write_string(af_test)
+        lcd.cursor_pos = (1, 0)
+        lcd.write_string(vol+"     ")
+#        time.sleep(0.1)
+#        GPIO.setup(VOLUME_UP, GPIO.IN)
+#        GPIO.setup(VOLUME_DOWN, GPIO.IN)
+#        GPIO.setup(CHANNEL_UP, GPIO.IN)
+#        GPIO.setup(CHANNEL_DOWN, GPIO.IN)
+
+# Register exit routine
+def finish():
+    exec_command("service mpd stop")
+    print("Radio stopped")
+
+atexit.register(finish)
+
+
+# Execute system command sub-routine
+def exec_command(cmd):
+     result = ""
+     p = os.popen(cmd)
+     for line in p.readline().split('\n'):
+          result = result + line
+     return result
+def next_radio():
+	global RADIO_station
+	global station 
+	if RADIO_station == 10:
+                RADIO_station = 10
+		station = str(RADIO_station)
+        	exec_command("service mpd stop")
+        	exec_command("service mpd start")
+       		exec_command("mpc clear")
+        	exec_command("mpc load radio")
+	        exec_command("mpc play"+" "+station)
+ 
+	else:
+                RADIO_station = RADIO_station +1
+		exec_command("mpc next")
+	#station = str(RADIO_station)
+	#exec_command("service mpd stop")
+	#exec_command("service mpd start")
+	#exec_command("mpc clear")
+	#exec_command("mpc load radio")
+	#exec_command("mpc play"+" "+station)
+	
+def prev_radio():
+	global RADIO_station
+	global station
+	if RADIO_station == 1:
+		RADIO_station = 1
+                station = str(RADIO_station)
+		exec_command("service mpd stop")
+                exec_command("service mpd start")
+                exec_command("mpc clear")
+                exec_command("mpc load radio")
+                exec_command("mpc play"+" "+station)
+		
+	else:
+		RADIO_station = RADIO_station -1 
+		exec_command("mpc prev")
+	#station = str(RADIO_station)
+	#exec_command("service mpd stop")
+	#exec_command("service mpd start")
+	#exec_command("mpc clear")
+	#exec_command("mpc load radio")
+	#exec_command("mpc play"+" "+station)
+
+### Main routine ###
+if __name__ == "__main__":
+     GPIO.setmode(GPIO.BOARD)
+     GPIO.setup(VOLUME_UP,GPIO.IN)
+     GPIO.setup(VOLUME_DOWN,GPIO.IN)
+     GPIO.setup(CHANNEL_UP,GPIO.IN)
+     GPIO.setup(CHANNEL_DOWN,GPIO.IN)
+     GPIO.setup(SHUTDOWN,GPIO.IN)
+     exec_command("service mpd start")
+     exec_command("mpc clear")
+     exec_command("mpc load radio")
+     exec_command("mpc play 1")
+
+#     exec_command("mpc volume 70")
+
+     while True:
+         # newChannel = False
+          if ( GPIO.input(VOLUME_UP) == False ):
+		exec_command("mpc volume +4")
+		volume = exec_command("mpc volume")
+                affichage()
+		print "d"
+          if ( GPIO.input(VOLUME_DOWN) == False ):
+		exec_command("mpc volume -4")
+		volume = exec_command("mpc volume")
+		affichage()
+		print "c"
+          if ( GPIO.input(CHANNEL_UP) == False ):
+               next_radio()
+         #      newChannel = True
+               current = exec_command("mpc current")
+               volume = exec_command("mpc volume")
+               affichage()
+               print current
+
+          if ( GPIO.input(CHANNEL_DOWN) == False ):
+               prev_radio()
+               current = exec_command("mpc current")
+               volume = exec_command("mpc volume")
+               affichage()
+               print current
+
+          #if newChannel:
+	#	current = exec_command("mpc current")
+	#	volume = exec_command("mpc volume")
+	#	affichage()
+	#	print current
+	  if start:
+		current = "France Inter"
+                
+		volume = exec_command("mpc volume")
+                affichage()
+		time.sleep(2)
+	        exec_command("mpc play 1")
+		start = False
+#          sleep(0.2)
+          if ( GPIO.input(SHUTDOWN) == False ):
+		exec_command("service mpd stop")
+    		print("Radio stopped")
+                exec_command("shutdown -h now")
+                
+
